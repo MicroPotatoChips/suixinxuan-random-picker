@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#10142d">
-  <meta name="description" content="随心选——一台精致、好用的随机抽选扭蛋机，名单在本机长期保存。">
-  <title>随心选 · 幸运扭蛋机</title>
+  <meta name="description" content="随心选——扭蛋机与单格老虎机随机抽选，名单和七个数据模块在本机长期保存。">
+  <title>随心选 · 幸运抽选机</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2310142d'/%3E%3Ccircle cx='32' cy='27' r='19' fill='%23ffe470'/%3E%3Cpath d='M14 27h36a18 18 0 0 1-36 0' fill='%23ff6577'/%3E%3Ccircle cx='32' cy='27' r='4' fill='%23fff'/%3E%3C/svg%3E">
   <style>
     :root {
@@ -112,8 +112,11 @@
 
     .machine-stage {
       min-height: 695px;
-      display: grid;
-      place-items: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
       padding: 28px 20px 20px;
       border-radius: 38px;
       overflow: hidden;
@@ -135,7 +138,14 @@
       background: rgba(91,201,238,.1);
       filter: blur(3px);
       top: 18px;
+      pointer-events: none;
     }
+
+    .mode-tabs { position: relative; z-index: 3; display: flex; gap: 5px; padding: 5px; border: 1px solid rgba(255,255,255,.17); border-radius: 16px; background: rgba(255,255,255,.09); }
+    .mode-tab { min-width: 122px; padding: 11px 18px; border: 0; border-radius: 12px; background: transparent; color: #cbd2ee; font-weight: 800; cursor: pointer; }
+    .mode-tab[aria-selected="true"] { background: var(--yellow); color: var(--navy); box-shadow: 0 3px 12px rgba(0,0,0,.18); }
+    .mode-tab:focus-visible, .module-edit:focus-visible, .slot-button:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+    [hidden] { display: none !important; }
 
     .machine {
       width: min(475px, 100%);
@@ -370,6 +380,46 @@
     .machine-feet { display: flex; justify-content: space-between; padding: 0 48px; }
     .foot { width: 70px; height: 18px; border: 5px solid #0a0d20; border-top: 0; border-radius: 0 0 14px 14px; background: #333955; }
 
+    .slot-machine { width: min(450px, 100%); position: relative; z-index: 2; color: white; filter: drop-shadow(0 22px 26px rgba(0,0,0,.36)); }
+    .slot-marquee { position: relative; z-index: 2; margin: 0 24px -7px; padding: 18px 12px; text-align: center; border: 6px solid #0a0d20; border-radius: 28px 28px 14px 14px; background: linear-gradient(135deg, #ffe57c, #ffb83c); color: var(--navy); box-shadow: inset 0 4px rgba(255,255,255,.6); }
+    .slot-marquee strong { display: block; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 1000; letter-spacing: .16em; }
+    .slot-marquee small { display: block; margin-top: 3px; font-size: .7rem; font-weight: 900; letter-spacing: .25em; }
+    .slot-shell { min-height: 460px; padding: 42px 28px 28px; border: 7px solid #0a0d20; border-radius: 32px 32px 45px 45px; background: linear-gradient(145deg, #a387ff, #7557cc 70%, #54369f); box-shadow: inset 10px 9px rgba(255,255,255,.13); }
+    .slot-lights { display: flex; justify-content: space-between; gap: 9px; margin-bottom: 28px; }
+    .slot-lights i { width: 12px; height: 12px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 13px var(--yellow); }
+    .slot-window { position: relative; height: 142px; display: grid; place-items: center; overflow: hidden; padding: 15px 20px; border: 7px solid #0a0d20; border-radius: 24px; background: linear-gradient(#fffaf0, #e8e9f8 48%, #fffaf0); box-shadow: inset 0 12px 20px rgba(10,13,32,.15), 0 8px rgba(10,13,32,.28); }
+    .slot-window::before, .slot-window::after { content: ""; position: absolute; left: 0; right: 0; height: 30px; z-index: 1; pointer-events: none; }
+    .slot-window::before { top: 0; background: linear-gradient(#c4c4dd, transparent); }
+    .slot-window::after { bottom: 0; background: linear-gradient(transparent, #c4c4dd); }
+    .slot-reel { max-width: 100%; color: var(--navy); text-align: center; font-size: clamp(1.4rem, 3vw, 2.2rem); line-height: 1.2; font-weight: 1000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .slot-window.rolling .slot-reel { animation: reelPulse .13s ease-in-out infinite alternate; }
+    @keyframes reelPulse { to { transform: translateY(-12px); filter: blur(2px); } }
+    .slot-meta { display: flex; justify-content: space-between; gap: 12px; margin: 19px 2px 25px; color: #e9dfff; font-size: .78rem; font-weight: 800; }
+    .slot-meta span:last-child { text-align: right; }
+    .slot-button { width: 100%; min-height: 65px; border: 4px solid #0a0d20; border-radius: 18px; color: var(--navy); background: var(--yellow); box-shadow: 0 8px #0a0d20, inset 0 5px rgba(255,255,255,.45); cursor: pointer; font-size: 1.17rem; font-weight: 1000; letter-spacing: .06em; transition: transform .15s ease, box-shadow .15s ease; }
+    .slot-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px #0a0d20, inset 0 5px rgba(255,255,255,.45); }
+    .slot-button:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 2px #0a0d20; }
+    .slot-button:disabled { cursor: not-allowed; opacity: .65; }
+    .slot-caption { margin: 22px 0 0; text-align: center; color: #ded7fa; font-size: .78rem; }
+
+    .slot-controls { display: flex; flex-direction: column; }
+    .slot-intro { margin: 0 0 17px; color: var(--muted); font-size: .83rem; line-height: 1.6; }
+    .module-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .module-card { display: flex; align-items: center; min-width: 0; gap: 8px; padding: 9px; border: 1.5px solid var(--line); border-radius: 14px; background: #f8f8fc; }
+    .module-card.active { border-color: var(--purple); background: #f3efff; }
+    .module-check { width: 18px; height: 18px; flex: 0 0 auto; accent-color: #7655cc; cursor: pointer; }
+    .module-edit { flex: 1; min-width: 0; padding: 0; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; }
+    .module-edit strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .82rem; }
+    .module-edit small { display: block; margin-top: 2px; color: var(--muted); font-size: .7rem; }
+    .module-editor { margin-top: 18px; padding: 17px; border: 1.5px solid var(--line); border-radius: 18px; background: #fff; }
+    .module-editor label { display: block; margin-bottom: 7px; font-size: .82rem; font-weight: 800; }
+    .module-title-input { width: 100%; min-height: 41px; padding: 9px 11px; border: 1.5px solid var(--line); border-radius: 10px; outline: none; color: var(--ink); background: #fff; }
+    .module-title-input:focus, .module-items-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(154,124,242,.14); }
+    .module-items-label { margin-top: 15px; }
+    .module-items-input { min-height: 123px; padding: 9px 11px; border: 1.5px solid var(--line); border-radius: 10px; outline: none; resize: vertical; }
+    .module-hint { margin: 8px 0 0; color: var(--muted); font-size: .74rem; line-height: 1.5; }
+    .slot-summary { margin-top: 13px; padding: 11px 13px; border-radius: 12px; color: #654caa; background: #f2edff; font-size: .78rem; font-weight: 800; }
+
     .control-card {
       min-height: 695px;
       padding: 28px;
@@ -512,6 +562,11 @@
       .crank-wrap { right: 15px; }
       .chute { left: 12px; width: calc(100% - 24px); }
       .control-card { border-radius: 24px; padding: 21px; }
+      .mode-tab { min-width: 106px; padding: 10px 12px; }
+      .slot-machine { width: calc(100% - 14px); }
+      .slot-shell { min-height: 420px; padding: 36px 20px 22px; }
+      .module-grid { gap: 7px; }
+      .module-card { padding: 8px 6px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -527,12 +582,16 @@
         </div>
         <div><h1>随心选</h1><small>LUCKY PICKER</small></div>
       </div>
-      <div class="save-state"><span>名单自动保存在此设备</span></div>
+      <div class="save-state"><span>设置自动保存在此设备</span></div>
     </header>
 
     <div class="workspace">
       <section class="machine-stage" aria-label="随机抽选机">
-        <div class="machine">
+        <div class="mode-tabs" role="tablist" aria-label="抽选方式">
+          <button class="mode-tab" id="gachaTab" role="tab" aria-selected="true" aria-controls="gachaMachine">扭蛋机</button>
+          <button class="mode-tab" id="slotTab" role="tab" aria-selected="false" aria-controls="slotMachine">单格老虎机</button>
+        </div>
+        <div class="machine" id="gachaMachine" role="tabpanel" aria-labelledby="gachaTab">
           <div class="machine-top"></div>
           <div class="globe" id="globe">
             <div class="capsules" id="capsules" aria-hidden="true"></div>
@@ -554,9 +613,20 @@
           </div>
           <div class="machine-feet"><div class="foot"></div><div class="foot"></div></div>
         </div>
+        <div class="slot-machine" id="slotMachine" role="tabpanel" aria-labelledby="slotTab" hidden>
+          <div class="slot-marquee"><strong>随心选</strong><small>LUCKY SLOT · SINGLE REEL</small></div>
+          <div class="slot-shell">
+            <div class="slot-lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="slot-window" id="slotWindow" aria-live="polite" aria-atomic="true"><div class="slot-reel" id="slotReel">准备抽选</div></div>
+            <div class="slot-meta"><span id="slotPoolLabel">已选 0 个模块</span><span id="slotResultModule">一次抽出一个结果</span></div>
+            <button class="slot-button" id="slotDrawBtn" type="button">开始抽选</button>
+            <p class="slot-caption">每次只显示一个结果 · 从勾选的模块中随机抽取</p>
+          </div>
+          <div class="machine-feet"><div class="foot"></div><div class="foot"></div></div>
+        </div>
       </section>
 
-      <aside class="control-card" aria-label="名单设置">
+      <aside class="control-card" id="gachaControls" aria-label="名单设置">
         <div class="section-head">
           <h2>参与名单</h2>
           <span class="count-badge" id="nameCount">0 / 50</span>
@@ -589,6 +659,20 @@
         </div>
         <div class="footer-note">按 Ctrl + Enter 也可以快速抽取</div>
       </aside>
+      <aside class="control-card slot-controls" id="slotControls" aria-label="老虎机模块设置" hidden>
+        <div class="section-head"><h2>数据模块</h2><span class="count-badge">7 个可编辑模块</span></div>
+        <p class="slot-intro">勾选要加入老虎机的模块；点模块名称可以修改标题和内容。可同时选多个，每次随机抽出一个结果。</p>
+        <div class="module-grid" id="moduleGrid" aria-label="选择参与抽选的模块"></div>
+        <div class="module-editor">
+          <label for="moduleTitle">模块名称</label>
+          <input class="module-title-input" id="moduleTitle" type="text" maxlength="30" placeholder="给模块起个名字">
+          <label class="module-items-label" for="moduleItems">模块内容</label>
+          <textarea class="module-items-input" id="moduleItems" maxlength="5000" placeholder="每行一个抽选内容，也可用逗号分隔"></textarea>
+          <p class="module-hint">自动保存到当前设备。每个模块最多 50 项，重复内容会自动合并。</p>
+        </div>
+        <div class="slot-summary" id="slotSummary" role="status">请先编辑并勾选模块</div>
+        <div class="footer-note">按 Ctrl + Enter 也可以快速抽取</div>
+      </aside>
     </div>
   </main>
   <div class="toast" id="toast" role="status"></div>
@@ -599,6 +683,9 @@
       const STORAGE_KEY = 'suixinxuan.names.v1';
       const HISTORY_KEY = 'suixinxuan.history.v1';
       const OPTION_KEY = 'suixinxuan.noRepeat.v1';
+      const SLOT_MODULES_KEY = 'suixinxuan.slotModules.v1';
+      const SLOT_SELECTED_KEY = 'suixinxuan.slotSelected.v1';
+      const MODE_KEY = 'suixinxuan.mode.v1';
       const COLORS = ['#ffdf59','#ff7184','#56d6bc','#5bc9ee','#9a7cf2','#ff9f4b'];
       const DEFAULT_NAMES = ['小明','小红','小宇','小林','小周','小夏','小北','安安'];
 
@@ -607,12 +694,31 @@
         input: $('nameInput'), save: $('saveBtn'), clear: $('clearBtn'), draw: $('drawBtn'),
         reset: $('resetBtn'), noRepeat: $('noRepeat'), capsules: $('capsules'), globe: $('globe'),
         winnerBall: $('winnerBall'), winnerName: $('winnerName'), resultLabel: $('resultLabel'),
-        count: $('nameCount'), poolCount: $('poolCount'), history: $('historyList'), toast: $('toast')
+        count: $('nameCount'), poolCount: $('poolCount'), history: $('historyList'), toast: $('toast'),
+        gachaTab: $('gachaTab'), slotTab: $('slotTab'), gachaMachine: $('gachaMachine'), slotMachine: $('slotMachine'),
+        gachaControls: $('gachaControls'), slotControls: $('slotControls'), moduleGrid: $('moduleGrid'),
+        moduleTitle: $('moduleTitle'), moduleItems: $('moduleItems'), slotSummary: $('slotSummary'),
+        slotWindow: $('slotWindow'), slotReel: $('slotReel'), slotDraw: $('slotDrawBtn'),
+        slotPoolLabel: $('slotPoolLabel'), slotResultModule: $('slotResultModule')
       };
 
       let names = loadJSON(STORAGE_KEY, DEFAULT_NAMES);
       let history = loadJSON(HISTORY_KEY, []);
       let drawing = false;
+      const initialModules = Array.from({ length: 7 }, (_, i) => ({
+        name: i === 0 ? '人员名单' : `模块 ${i + 1}`,
+        items: i === 0 ? [...names] : []
+      }));
+      let slotModules = loadJSON(SLOT_MODULES_KEY, initialModules).slice(0, 7).map((module, i) => ({
+        name: typeof module?.name === 'string' ? module.name.slice(0, 30) : initialModules[i].name,
+        items: Array.isArray(module?.items) ? module.items.filter(item => typeof item === 'string').slice(0, 50) : initialModules[i].items
+      }));
+      while (slotModules.length < 7) slotModules.push(initialModules[slotModules.length]);
+      let slotSelected = loadJSON(SLOT_SELECTED_KEY, [true, false, false, false, false, false, false]).slice(0, 7).map(Boolean);
+      while (slotSelected.length < 7) slotSelected.push(false);
+      let editingModule = 0;
+      let slotDrawing = false;
+      let slotMode = localStorage.getItem(MODE_KEY) === 'slot';
       el.noRepeat.checked = localStorage.getItem(OPTION_KEY) !== 'false';
 
       function loadJSON(key, fallback) {
@@ -627,6 +733,80 @@
           if (!n || seen.has(key)) return false;
           seen.add(key); return true;
         }).slice(0, 50);
+      }
+
+      function moduleName(index) {
+        return slotModules[index].name.trim() || `模块 ${index + 1}`;
+      }
+
+      function slotPool() {
+        return slotModules.flatMap((module, index) => slotSelected[index]
+          ? module.items.map(value => ({ value, module: moduleName(index) })) : []);
+      }
+
+      function persistSlot() {
+        localStorage.setItem(SLOT_MODULES_KEY, JSON.stringify(slotModules));
+        localStorage.setItem(SLOT_SELECTED_KEY, JSON.stringify(slotSelected));
+      }
+
+      function renderSlot() {
+        el.moduleGrid.innerHTML = slotModules.map((module, index) => `
+          <div class="module-card ${editingModule === index ? 'active' : ''}">
+            <input class="module-check" type="checkbox" data-index="${index}" aria-label="将${escapeHTML(moduleName(index))}加入老虎机" ${slotSelected[index] ? 'checked' : ''}>
+            <button class="module-edit" type="button" data-index="${index}" aria-label="编辑${escapeHTML(moduleName(index))}" aria-pressed="${editingModule === index}"><strong>${escapeHTML(moduleName(index))}</strong><small>${module.items.length} 项 · 点击编辑</small></button>
+          </div>`).join('');
+        const pool = slotPool();
+        const chosen = slotSelected.filter(Boolean).length;
+        el.slotPoolLabel.textContent = `已选 ${chosen} 个模块`;
+        el.slotSummary.textContent = pool.length
+          ? `当前抽选池：${chosen} 个模块，共 ${pool.length} 项。每次抽出 1 项。`
+          : chosen ? '已选模块没有内容，请先编辑内容。' : '请勾选至少一个模块加入老虎机。';
+        el.slotDraw.disabled = slotDrawing || !pool.length;
+      }
+
+      function openModule(index) {
+        editingModule = index;
+        el.moduleTitle.value = slotModules[index].name;
+        el.moduleItems.value = slotModules[index].items.join('\n');
+        renderSlot();
+      }
+
+      function setMode(next) {
+        slotMode = next === 'slot';
+        el.gachaTab.setAttribute('aria-selected', String(!slotMode));
+        el.slotTab.setAttribute('aria-selected', String(slotMode));
+        el.gachaMachine.hidden = slotMode;
+        el.slotMachine.hidden = !slotMode;
+        el.gachaControls.hidden = slotMode;
+        el.slotControls.hidden = !slotMode;
+        localStorage.setItem(MODE_KEY, slotMode ? 'slot' : 'gacha');
+      }
+
+      function drawSlot() {
+        const pool = slotPool();
+        if (slotDrawing || !pool.length) {
+          showToast(pool.length ? '抽选正在进行中' : '请先勾选有内容的模块');
+          return;
+        }
+        slotDrawing = true;
+        el.slotDraw.disabled = true;
+        el.slotDraw.textContent = '抽选中…';
+        el.slotResultModule.textContent = '幸运结果即将出现';
+        el.slotWindow.classList.add('rolling');
+        const winner = pool[secureIndex(pool.length)];
+        const cycle = setInterval(() => {
+          el.slotReel.textContent = pool[secureIndex(pool.length)].value;
+        }, 75);
+        setTimeout(() => {
+          clearInterval(cycle);
+          el.slotWindow.classList.remove('rolling');
+          el.slotReel.textContent = winner.value;
+          el.slotResultModule.textContent = `来自「${winner.module}」`;
+          el.slotDraw.textContent = '再抽一次';
+          slotDrawing = false;
+          renderSlot();
+          confetti();
+        }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 150 : 1850);
       }
 
       function secureIndex(length) {
@@ -814,11 +994,39 @@
         el.count.textContent = `${count} / 50`;
         el.count.classList.toggle('limit', count >= 50);
       });
+      el.gachaTab.addEventListener('click', () => setMode('gacha'));
+      el.slotTab.addEventListener('click', () => setMode('slot'));
+      el.moduleGrid.addEventListener('change', event => {
+        if (!event.target.matches('.module-check')) return;
+        slotSelected[Number(event.target.dataset.index)] = event.target.checked;
+        persistSlot();
+        renderSlot();
+      });
+      el.moduleGrid.addEventListener('click', event => {
+        const button = event.target.closest('.module-edit');
+        if (button) openModule(Number(button.dataset.index));
+      });
+      el.moduleTitle.addEventListener('input', () => {
+        slotModules[editingModule].name = el.moduleTitle.value.slice(0, 30);
+        persistSlot();
+        renderSlot();
+      });
+      el.moduleItems.addEventListener('input', () => {
+        slotModules[editingModule].items = parseNames(el.moduleItems.value);
+        persistSlot();
+        renderSlot();
+      });
+      el.slotDraw.addEventListener('click', drawSlot);
       document.addEventListener('keydown', (event) => {
-        if (event.ctrlKey && event.key === 'Enter') { event.preventDefault(); draw().catch(() => {}); }
+        if (event.ctrlKey && event.key === 'Enter') {
+          event.preventDefault();
+          if (slotMode) drawSlot(); else draw().catch(() => {});
+        }
       });
 
       render();
+      openModule(0);
+      setMode(slotMode ? 'slot' : 'gacha');
       registerWebMCP();
     })();
   </script>
